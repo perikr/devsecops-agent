@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Build demo.mp4 from HTML slides + macOS `say` narration + ffmpeg. Stdlib only.
-Run: python3 demo_video/build_video.py   (needs ffmpeg, say, Google Chrome)
+"""Build demo.mp4 from HTML slides + synthesized rock music (make_rock.py) + ffmpeg. Stdlib only.
+Run: python3 demo_video/build_video.py   (needs ffmpeg, Google Chrome)
 Numbers on the terminal slide come from reports/findings_*.json; the savings model uses the
 ASSUMPTIONS below, which are examples to edit, not measurements."""
 import collections, glob, html, json, os, shutil, subprocess
@@ -11,7 +11,6 @@ WORK = os.path.join(HERE, "build")
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 AUTHOR = "Krishna Peri"
 GITHUB = "github.com/perikr/devsecops-agent"
-VOICE = "Samantha"
 STATIC_SCAN_SECONDS = 3  # measured: scan.py demo_target (Semgrep + Gitleaks + Trivy), warm cache
 
 # Illustrative model: edit to match your team.
@@ -43,7 +42,7 @@ term = (f"$ python3 scan.py demo_target --dast-url http://demo-app:5055 --fail-o
         f"[scan] SCA/IaC trivy     {by_type['SCA'] + by_type['IaC']} findings\n[scan] DAST zap          {by_type['DAST']} findings\n"
         f"[scan] counts: critical {C['critical']}, high {C['high']}, medium {C['medium']}, low {C['low']}\n[gate] FAIL: {C['critical']} findings >= critical")
 
-# (title, html body, narration)
+# (title, html body, spoken-style script; only its length is used to set how long each slide stays up, no voice is rendered)
 SLIDES = [
  ("DevSecOps Agent", f"<p class=sub style='font-size:42px;color:#e8eaed'>Automated security checks with free tools and OpenClaw</p><p class=sub>Created by {AUTHOR}</p>",
   f"Hello, I am {AUTHOR}. This is the DevSecOps Agent: automated security checks built from free, open source tools and driven by an OpenClaw agent."),
@@ -80,22 +79,27 @@ def main():
     dash = os.path.join(WORK, "dash.html")  # copy with the local path replaced so it is not shown in the video
     open(dash, "w").write(open(os.path.join(ROOT, "dashboard.html"), encoding="utf-8").read().replace(f["target"], "demo_target"))
     shot(dash, os.path.join(WORK, "dashboard.png"), "1280,720")
-    clips = []
+    clips, total = [], 0.0
     for i, (title, body, narr) in enumerate(SLIDES):
         foot = f"{AUTHOR} | DevSecOps Agent" + (f" | {GITHUB}" if i == len(SLIDES) - 1 else "")
-        page, png, aiff, mp4 = (os.path.join(WORK, f"s{i}.{e}") for e in ("html", "png", "aiff", "mp4"))
+        page, png, mp4 = (os.path.join(WORK, f"s{i}.{e}") for e in ("html", "png", "mp4"))
         open(page, "w").write(slide(title, body, foot))
         shot(page, png)
-        sh("say", "-v", VOICE, "-o", aiff, narr)
-        dur = float(sh("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", aiff).stdout) + 0.8
-        sh("ffmpeg", "-y", "-loop", "1", "-framerate", "30", "-i", png, "-i", aiff, "-t", f"{dur:.2f}", "-af", "apad",
-           "-vf", f"fade=in:d=0.4,fade=out:st={dur - 0.4:.2f}:d=0.4,format=yuv420p", "-c:v", "libx264", "-c:a", "aac", "-ar", "44100", "-ac", "2", mp4)
+        dur = max(8.0, len(narr.split()) / 2.4 + 1.5)  # reading time
+        total += dur
+        sh("ffmpeg", "-y", "-loop", "1", "-framerate", "30", "-i", png, "-t", f"{dur:.2f}",
+           "-vf", f"fade=in:d=0.4,fade=out:st={dur - 0.4:.2f}:d=0.4,format=yuv420p", "-c:v", "libx264", "-an", mp4)
         clips.append(mp4)
         print("slide", i + 1, f"{dur:.1f}s")
     lst = os.path.join(WORK, "list.txt")
     open(lst, "w").write("".join(f"file '{c}'\n" for c in clips))
+    silent = os.path.join(WORK, "silent.mp4")
+    sh("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", silent)
+    wav = os.path.join(WORK, "rock.wav")
+    sh("python3", os.path.join(HERE, "make_rock.py"), wav)
     out = os.path.join(HERE, "demo.mp4")
-    sh("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", out)
+    sh("ffmpeg", "-y", "-i", silent, "-stream_loop", "-1", "-i", wav, "-t", f"{total:.2f}", "-map", "0:v", "-map", "1:a", "-c:v", "copy",
+       "-af", f"volume=0.9,afade=t=in:d=1,afade=t=out:st={total - 3:.2f}:d=3", "-c:a", "aac", "-ar", "44100", "-ac", "2", out)
     print("built", out)
 
 if __name__ == "__main__":

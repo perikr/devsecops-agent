@@ -25,7 +25,8 @@ Copy `.gitlab-ci.yml` into a GitLab repo for the pipeline version. DAST only aga
 checkov (more IaC), nuclei (authorized DAST templates), OPA (policy gates), semgrep/mcp or secops-mcp (expose scans as MCP tools), ollama (free local LLM for triage), The-PR-Agent (MR review).
 
 ## Demo
-Video walkthrough (about 2.5 min): [`demo_video/demo.mp4`](demo_video/demo.mp4). Rebuild with `python3 demo_video/build_video.py` (needs ffmpeg, macOS `say`, Google Chrome).
+Video walkthrough (about 2 min 48 s): [`demo_video/demo.mp4`](demo_video/demo.mp4). Rebuild with `python3 demo_video/build_video.py` (needs ffmpeg, Google Chrome).
+Soundtrack: an original rock loop synthesized by `demo_video/make_rock.py` (no copyrighted music, no voice-over).
 Created by Krishna Peri (github.com/perikr/devsecops-agent).
 
 ## Advantages and savings
