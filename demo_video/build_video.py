@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build demo.mp4 from HTML slides + synthesized rock music (make_rock.py) + ffmpeg. Stdlib only.
+"""Build demo.mp4 from HTML slides + synthesized background music (make_music.py) + ffmpeg. Stdlib only.
 Run: python3 demo_video/build_video.py   (needs ffmpeg, Google Chrome)
 Numbers on the terminal slide come from reports/findings_*.json; the savings model uses the
 ASSUMPTIONS below, which are examples to edit, not measurements."""
@@ -10,7 +10,7 @@ ROOT = os.path.dirname(HERE)
 WORK = os.path.join(HERE, "build")
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 AUTHOR = "Krishna Peri"
-GITHUB = "github.com/perikr/devsecops-agent"
+LINKEDIN = ""  # your LinkedIn profile URL, e.g. "linkedin.com/in/your-name"; shown on the end card when set
 STATIC_SCAN_SECONDS = 3  # measured: scan.py demo_target (Semgrep + Gitleaks + Trivy), warm cache
 
 # Illustrative model: edit to match your team.
@@ -60,8 +60,10 @@ SLIDES = [
   f"<p class=sub style='margin-top:20px'>Example model: {REPOS} repos, scanned {RUNS_PER_MONTH} times a month, {MIN_MANUAL_PER_REPO} min manual vs {MIN_AGENT_REVIEW_PER_REPO} min with the agent: about {manual_h:.0f} h vs {agent_h:.0f} h, saving roughly {manual_h - agent_h:.0f} hours a month.</p>"
   "<p class=note>The model uses assumed minutes, not measurements. Replace them with your team's numbers in build_video.py.</p>",
   f"On the demo we measured a {STATIC_SCAN_SECONDS} second static scan, {total} findings, and the agent shortlisting {triaged} of them for review, with zero scanner licence cost. As an example only: for {REPOS} repositories scanned four times a month, assuming forty five minutes of manual work per repository versus ten with the agent, the saving is about {manual_h - agent_h:.0f} hours a month. Those minutes are assumptions, so replace them with your own."),
- ("Get started", ul("<code>python3 scan.py demo_target</code>", "<code>./run_agent.sh</code> for agent triage", "Copy <code>.gitlab-ci.yml</code> into your repo", "Scan only systems you own or are authorised to test", f"GitHub: <b>{GITHUB}</b>"),
+ ("Get started", ul("<code>python3 scan.py demo_target</code>", "<code>./run_agent.sh</code> for agent triage", "Copy <code>.gitlab-ci.yml</code> into your repo", "Scan only systems you own or are authorised to test"),
   f"To start, run scan dot py, then the agent script, and copy the GitLab file into your repository. Scan only systems you own or are authorised to test. Thank you for watching. This project was created by {AUTHOR}."),
+ ("Thank you", f"<p class=big>{AUTHOR}</p><p class=sub style='font-size:40px;color:#e8eaed'>DevSecOps Agent: automated security checks with free tools</p>" + (f"<p class=sub>{LINKEDIN}</p>" if LINKEDIN else ""),
+  "Thank you for watching."),
 ]
 
 TERM_CSS = """body{margin:0;width:1920px;height:1080px;background:#0f141b;font-family:Menlo,monospace}
@@ -136,7 +138,7 @@ def main():
         if title == "One command":
             mp4, d = render_live(events, shot, WORK)
             clips.append(mp4); total += d; print("live clip", f"{d:.1f}s"); continue
-        foot = f"{AUTHOR} | DevSecOps Agent" + (f" | {GITHUB}" if i == len(SLIDES) - 1 else "")
+        foot = f"{AUTHOR} | DevSecOps Agent" + (f" | {LINKEDIN}" if LINKEDIN and i == len(SLIDES) - 1 else "")
         page, png, mp4 = (os.path.join(WORK, f"s{i}.{e}") for e in ("html", "png", "mp4"))
         open(page, "w").write(slide(title, body, foot))
         shot(page, png)
@@ -151,10 +153,10 @@ def main():
     silent = os.path.join(WORK, "silent.mp4")
     sh("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "30", silent)
     wav = os.path.join(WORK, "rock.wav")
-    sh("python3", os.path.join(HERE, "make_rock.py"), wav)
+    sh("python3", os.path.join(HERE, "make_music.py"), wav)
     out = os.path.join(HERE, "demo.mp4")
     sh("ffmpeg", "-y", "-i", silent, "-stream_loop", "-1", "-i", wav, "-t", f"{total:.2f}", "-map", "0:v", "-map", "1:a", "-c:v", "copy",
-       "-af", f"volume=0.9,afade=t=in:d=1,afade=t=out:st={total - 3:.2f}:d=3", "-c:a", "aac", "-ar", "44100", "-ac", "2", out)
+       "-af", f"aecho=0.8:0.6:140|280:0.22|0.12,loudnorm=I=-20:TP=-2:LRA=7,afade=t=in:d=1.5,afade=t=out:st={total - 3:.2f}:d=3", "-c:a", "aac", "-ar", "44100", "-ac", "2", out)
     print("built", out)
 
 if __name__ == "__main__":
