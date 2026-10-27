@@ -10,7 +10,7 @@ ROOT = os.path.dirname(HERE)
 WORK = os.path.join(HERE, "build")
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 AUTHOR = "Krishna Peri"
-GITHUB = "github.com/perikr"
+GITHUB = "github.com/perikr/devsecops-agent"
 VOICE = "Samantha"
 STATIC_SCAN_SECONDS = 3  # measured: scan.py demo_target (Semgrep + Gitleaks + Trivy), warm cache
 

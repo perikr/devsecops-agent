@@ -26,7 +26,7 @@ checkov (more IaC), nuclei (authorized DAST templates), OPA (policy gates), semg
 
 ## Demo
 Video walkthrough (about 2.5 min): [`demo_video/demo.mp4`](demo_video/demo.mp4). Rebuild with `python3 demo_video/build_video.py` (needs ffmpeg, macOS `say`, Google Chrome).
-Created by Krishna Peri (github.com/perikr).
+Created by Krishna Peri (github.com/perikr/devsecops-agent).
 
 ## Advantages and savings
 - **No licence cost**: Semgrep, Gitleaks, Trivy and OWASP ZAP are open source; GitLab CI runs on the free tier.
