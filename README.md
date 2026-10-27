@@ -14,7 +14,8 @@
 python3 scan.py demo_target                       # SAST + secrets + SCA/IaC
 python3 scan.py demo_target --image myapp:latest  # + container scan
 python3 scan.py ./myrepo --dast-url http://localhost:5000   # + DAST (pulls ZAP image, ~1 GB)
-./run_agent.sh                                    # agent scans, triages, rebuilds dashboard
+python3 triage.py                                 # agent first-pass triage: top 10, verdict + fix
+./run_agent.sh                                    # optional: OpenClaw LLM agent for deeper review
 openclaw cron add --help                          # schedule run_agent.sh daily
 ```
 `scan.py` exits 1 when a finding meets `--fail-on` (default high), so it works as a CI gate.
@@ -25,7 +26,7 @@ Copy `.gitlab-ci.yml` into a GitLab repo for the pipeline version. DAST only aga
 checkov (more IaC), nuclei (authorized DAST templates), OPA (policy gates), semgrep/mcp or secops-mcp (expose scans as MCP tools), ollama (free local LLM for triage), The-PR-Agent (MR review).
 
 ## Demo
-Video walkthrough (about 2 min 48 s): [`demo_video/demo.mp4`](demo_video/demo.mp4). Rebuild with `python3 demo_video/build_video.py` (needs ffmpeg, Google Chrome).
+Video walkthrough (about 2 min 51 s, including a live run of the real commands): [`demo_video/demo.mp4`](demo_video/demo.mp4). Rebuild with `python3 demo_video/build_video.py` (needs ffmpeg, Google Chrome).
 Soundtrack: an original rock loop synthesized by `demo_video/make_rock.py` (no copyrighted music, no voice-over).
 Created by Krishna Peri (github.com/perikr/devsecops-agent).
 
@@ -33,7 +34,7 @@ Created by Krishna Peri (github.com/perikr/devsecops-agent).
 - **No licence cost**: Semgrep, Gitleaks, Trivy and OWASP ZAP are open source; GitLab CI runs on the free tier.
 - **One workflow** covers code (SAST), secrets, dependencies, IaC, containers and the running app (DAST).
 - **Less manual reading**: the OpenClaw agent triages the top findings, people review the shortlist.
-- **Low LLM cost**: scanning is plain tools with zero tokens; the model only sees the top 25 findings (25 of 48 on the demo).
+- **Low token cost**: scanning and the first-pass triage (`triage.py`) are plain code with zero tokens; an LLM agent (OpenClaw, optional, see `TASK.md`) is only needed for deeper review of what is left.
 - **Auditable**: each run saves a dated JSON report.
 
 Measured on the demo app: static scan (Semgrep + Gitleaks + Trivy) took 3 s on a warm cache; DAST adds the ZAP baseline run time.

@@ -5,7 +5,7 @@
   "info": 0,
   "low": 21,
   "medium": 15,
-  "high": 10,
+  "high": 11,
   "critical": 2
  },
  "findings": [
@@ -44,6 +44,18 @@
    "line": 2,
    "fix": "",
    "ref": "CWE-269: Improper Privilege Management"
+  },
+  {
+   "id": "c9b647b270c0",
+   "tool": "semgrep",
+   "type": "SAST",
+   "rule": "detected-generic-api-key",
+   "severity": "high",
+   "title": "Generic API Key detected",
+   "location": "app.py",
+   "line": 7,
+   "fix": "",
+   "ref": "CWE-798: Use of Hard-coded Credentials"
   },
   {
    "id": "63457b0016f0",
@@ -106,12 +118,12 @@
    "ref": "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
   },
   {
-   "id": "ef5170bac855",
+   "id": "fc1fb800dd18",
    "tool": "gitleaks",
    "type": "Secret",
    "rule": "generic-api-key",
    "severity": "high",
-   "title": "Detected a Generic API Key",
+   "title": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
    "location": "app.py",
    "line": 7,
    "fix": "Rotate the credential and move it to a secret manager / CI variable",
@@ -286,13 +298,13 @@
    "ref": "CWE-693"
   },
   {
-   "id": "0730aeb5f853",
+   "id": "46dd4f34a206",
    "tool": "zap",
    "type": "DAST",
    "rule": "10038",
    "severity": "medium",
    "title": "Content Security Policy (CSP) Header Not Set",
-   "location": "http://demo-app:5055/hello?n=a",
+   "location": "http://demo-app:5055/ping?host=localhost",
    "line": "",
    "fix": "Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header.",
    "ref": "CWE-693"
@@ -442,6 +454,18 @@
    "ref": "CWE-693"
   },
   {
+   "id": "05edadb8c387",
+   "tool": "zap",
+   "type": "DAST",
+   "rule": "10063",
+   "severity": "low",
+   "title": "Permissions Policy Header Not Set",
+   "location": "http://demo-app:5055/hello?n=a",
+   "line": "",
+   "fix": "Ensure that your web server, application server, load balancer, etc. is configured to set the Permissions-Policy header.",
+   "ref": "CWE-693"
+  },
+  {
    "id": "21b5223a7907",
    "tool": "zap",
    "type": "DAST",
@@ -449,18 +473,6 @@
    "severity": "low",
    "title": "Permissions Policy Header Not Set",
    "location": "http://demo-app:5055/ping?host=localhost",
-   "line": "",
-   "fix": "Ensure that your web server, application server, load balancer, etc. is configured to set the Permissions-Policy header.",
-   "ref": "CWE-693"
-  },
-  {
-   "id": "9e1cf498f2bc",
-   "tool": "zap",
-   "type": "DAST",
-   "rule": "10063",
-   "severity": "low",
-   "title": "Permissions Policy Header Not Set",
-   "location": "http://demo-app:5055/robots.txt",
    "line": "",
    "fix": "Ensure that your web server, application server, load balancer, etc. is configured to set the Permissions-Policy header.",
    "ref": "CWE-693"
@@ -490,13 +502,13 @@
    "ref": "CWE-497"
   },
   {
-   "id": "87bb0fa9f9f9",
+   "id": "70240893c0c9",
    "tool": "zap",
    "type": "DAST",
    "rule": "10036",
    "severity": "low",
    "title": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
-   "location": "http://demo-app:5055/robots.txt",
+   "location": "http://demo-app:5055/ping?host=localhost",
    "line": "",
    "fix": "Ensure that your web server, application server, load balancer, etc. is configured to suppress the \"Server\" header or provide generic details.",
    "ref": "CWE-497"

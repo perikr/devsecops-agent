@@ -107,7 +107,8 @@ def main():
     global DOCKER_NET
     DOCKER_NET = a.docker_network
     target = os.path.abspath(a.target)
-    tmp = tempfile.mkdtemp()
+    os.makedirs(os.path.join(BASE, "reports"), exist_ok=True)
+    tmp = tempfile.mkdtemp(dir=os.path.join(BASE, "reports"))  # must be under $HOME so Docker/Colima can mount it for ZAP
     steps = [("SAST semgrep", semgrep, target), ("Secrets gitleaks", gitleaks, target), ("SCA/IaC trivy", trivy_fs, target)]
     if a.image: steps.append(("Container trivy", trivy_image, a.image))
     if a.dast_url: steps.append(("DAST zap", zap, a.dast_url))
@@ -115,6 +116,7 @@ def main():
     for name, fn, arg in steps:
         print(f"[scan] {name} ...")
         r = fn(arg, tmp); print(f"       {len(r)} findings"); found += r
+    shutil.rmtree(tmp, ignore_errors=True)
     uniq = {f["id"]: f for f in found}.values()
     found = sorted(uniq, key=lambda f: -SEV.index(f["severity"]))
     today = datetime.date.today().isoformat()

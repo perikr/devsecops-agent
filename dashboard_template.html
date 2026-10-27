@@ -39,6 +39,6 @@ function draw(){const q=document.getElementById("q").value.toLowerCase();
 rows.innerHTML=L.findings.filter(f=>(!fs.value||f.severity==fs.value)&&(!ft.value||f.type==ft.value)&&JSON.stringify(f).toLowerCase().includes(q)).map(f=>{
 const t=D.triage[f.id];return `<tr><td class="sv ${f.severity}">${f.severity}</td><td>${esc(f.type)}<br><small>${esc(f.tool)}</small></td>
 <td>${esc(f.title)}<br><code>${esc(f.rule)}</code></td><td><code>${esc(f.location)}${f.line?":"+f.line:""}</code></td>
-<td>${esc(f.fix)}${t?`<div class="ai">AI: ${esc(t.verdict)} — ${esc(t.note)}</div>`:""}</td></tr>`}).join("")}
+<td>${esc(f.fix)}${t?`<div class="ai">Agent: ${esc(t.verdict)} — ${esc(t.note)}</div>`:""}</td></tr>`}).join("")}
 q.oninput=fs.onchange=ft.onchange=draw;draw();}
 </script></main></body></html>

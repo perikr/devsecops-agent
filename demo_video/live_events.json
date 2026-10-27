@@ -1,0 +1,138 @@
+[
+ {
+  "cmd": "ls -C",
+  "lines": [
+   {
+    "t": 0.0,
+    "text": "README.md\t\tdashboard_template.html\trun_agent.sh"
+   },
+   {
+    "t": 0.0,
+    "text": "TASK.md\t\t\tdemo_target\t\tscan.py"
+   },
+   {
+    "t": 0.0,
+    "text": "build_dashboard.py\tdemo_video\t\ttargets.txt"
+   },
+   {
+    "t": 0.0,
+    "text": "dashboard.html\t\treports\t\t\ttriage.py"
+   }
+  ],
+  "end": 0.0,
+  "exit": 0
+ },
+ {
+  "cmd": "python3 scan.py demo_target --dast-url http://demo-app:5055 --docker-network dast-net --fail-on critical",
+  "lines": [
+   {
+    "t": 0.03,
+    "text": "[scan] SAST semgrep ..."
+   },
+   {
+    "t": 1.86,
+    "text": "       15 findings"
+   },
+   {
+    "t": 1.86,
+    "text": "[scan] Secrets gitleaks ..."
+   },
+   {
+    "t": 1.9,
+    "text": "       1 findings"
+   },
+   {
+    "t": 1.9,
+    "text": "[scan] SCA/IaC trivy ..."
+   },
+   {
+    "t": 2.44,
+    "text": "       11 findings"
+   },
+   {
+    "t": 2.44,
+    "text": "[scan] DAST zap ..."
+   },
+   {
+    "t": 25.6,
+    "text": "       28 findings"
+   },
+   {
+    "t": 25.64,
+    "text": "Dashboard rebuilt: 1 runs"
+   },
+   {
+    "t": 25.65,
+    "text": "[scan] counts: {'info': 0, 'low': 21, 'medium': 15, 'high': 11, 'critical': 2} -> reports/findings_2026-10-27.json"
+   },
+   {
+    "t": 25.65,
+    "text": "[gate] FAIL: 2 findings >= critical"
+   }
+  ],
+  "end": 25.65,
+  "exit": 1
+ },
+ {
+  "cmd": "python3 triage.py",
+  "lines": [
+   {
+    "t": 0.02,
+    "text": "Triaging top 10 of 49 findings"
+   },
+   {
+    "t": 0.02,
+    "text": "critical| SCA   | CVE-2020-14343            | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "critical| SCA   | CVE-2020-1747             | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | Secret| generic-api-key           | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | SAST  | last-user-is-root         | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | SAST  | detected-generic-api-key  | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | SAST  | sqlalchemy-execute-raw-que| true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | SAST  | tainted-sql-string        | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | SAST  | subprocess-injection      | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | SAST  | dangerous-subprocess-use  | true-positive"
+   },
+   {
+    "t": 0.02,
+    "text": "high    | SAST  | subprocess-shell-true     | true-positive"
+   }
+  ],
+  "end": 0.02,
+  "exit": 0
+ },
+ {
+  "cmd": "python3 build_dashboard.py",
+  "lines": [
+   {
+    "t": 0.02,
+    "text": "Dashboard rebuilt: 1 runs"
+   }
+  ],
+  "end": 0.02,
+  "exit": 0
+ }
+]
