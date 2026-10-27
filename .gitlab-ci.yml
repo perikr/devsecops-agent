@@ -1,0 +1,36 @@
+# Free-tier GitLab pipeline: every job uses open-source tools, no paid licence needed.
+stages: [sast, secrets, sca, dast, report]
+
+semgrep-sast:
+  stage: sast
+  image: semgrep/semgrep:latest
+  script: semgrep scan --config p/default --config p/owasp-top-ten --metrics=off --json -o semgrep.json . || true
+  artifacts: { paths: [semgrep.json], when: always }
+
+gitleaks-secrets:
+  stage: secrets
+  image: { name: zricethezav/gitleaks:latest, entrypoint: [""] }
+  script: gitleaks dir . --report-format json --report-path gitleaks.json --redact || true
+  artifacts: { paths: [gitleaks.json], when: always }
+
+trivy-sca-iac:
+  stage: sca
+  image: { name: aquasec/trivy:latest, entrypoint: [""] }
+  script: trivy fs --scanners vuln,misconfig --format json -o trivy.json . 
+  artifacts: { paths: [trivy.json], when: always }
+
+zap-dast:
+  stage: dast
+  image: { name: ghcr.io/zaproxy/zaproxy:stable, entrypoint: [""] }
+  rules: [{ if: '$DAST_URL' }]            # set DAST_URL in CI/CD variables (staging only!)
+  script:
+    - mkdir -p /zap/wrk
+    - zap-baseline.py -t "$DAST_URL" -J zap.json -I
+    - cp /zap/wrk/zap.json . || true
+  artifacts: { paths: [zap.json], when: always }
+
+agent-report:
+  stage: report
+  image: python:3.12-slim
+  needs: [{ job: semgrep-sast, artifacts: true, optional: true }, { job: gitleaks-secrets, artifacts: true, optional: true }, { job: trivy-sca-iac, artifacts: true, optional: true }]
+  script: echo "Download artifacts and run scan.py locally with the OpenClaw agent for triage (see README)"

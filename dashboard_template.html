@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevSecOps Agent</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1b1f24;--muted:#6a7380;--line:#e3e6ea;--accent:#1f3a5f;--critical:#7a1fa2;--high:#b42318;--medium:#b54708;--low:#1a7f37;--info:#6a7380}
+@media (prefers-color-scheme:dark){:root{--bg:#14171c;--card:#1d2128;--text:#e8eaed;--muted:#99a1ad;--line:#2f353e;--accent:#7fb0ff;--critical:#d9a0ff;--high:#ff8a80;--medium:#ffb74d;--low:#6fd08c}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,system-ui,sans-serif}
+main{max-width:1200px;margin:0 auto;padding:20px 16px 60px}h1{margin:0 0 2px;font-size:22px}h2{font-size:15px;margin:26px 0 8px}
+.sub{color:var(--muted);margin-bottom:16px}.bar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+input,select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text)}
+input{flex:1;min-width:180px}.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}.tile b{display:block;font-size:24px}
+.tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%}th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px}.sv{font-weight:700;text-transform:uppercase;font-size:12px}
+.critical{color:var(--critical)}.high{color:var(--high)}.medium{color:var(--medium)}.low{color:var(--low)}.info{color:var(--info)}
+.ai{color:var(--muted);font-size:12px;margin-top:3px}code{font-size:12px;word-break:break-all}
+svg{width:100%;height:120px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+</style></head><body><main>
+<h1>DevSecOps Agent</h1><div class="sub" id="sub"></div>
+<div class="tiles" id="tiles"></div>
+<h2>Trend (last runs)</h2><svg id="trend" viewBox="0 0 600 120" preserveAspectRatio="none"></svg>
+<div class="bar"><input id="q" type="search" placeholder="Search findings..."><select id="fs"><option value="">All severities</option></select><select id="ft"><option value="">All types</option></select></div>
+<div class="tbl"><table><thead><tr><th>Sev</th><th>Type</th><th>Finding</th><th>Location</th><th>Fix / AI triage</th></tr></thead><tbody id="rows"></tbody></table></div>
+<script>
+const D=/*DATA*/null, SEV=["critical","high","medium","low","info"];
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const L=D.latest;
+if(!L){document.getElementById("sub").textContent="No scans yet. Run: python3 scan.py <target>"}
+else{
+document.getElementById("sub").textContent=`Target ${L.target} · scan ${L.date} · built ${D.built}`;
+document.getElementById("tiles").innerHTML=SEV.map(s=>`<div class="tile"><span class="sv ${s}">${s}</span><b>${L.counts[s]||0}</b></div>`).join("");
+const tr=D.trend,mx=Math.max(1,...tr.map(t=>SEV.reduce((a,s)=>a+(t[s]||0),0)));
+document.getElementById("trend").innerHTML=tr.map((t,i)=>{const w=600/Math.max(tr.length,1),tot=SEV.reduce((a,s)=>a+(t[s]||0),0),h=tot/mx*100;
+return `<rect x="${i*w+4}" y="${115-h}" width="${w-8}" height="${h}" fill="var(--accent)"><title>${t.date}: ${tot}</title></rect>`}).join("");
+const types=[...new Set(L.findings.map(f=>f.type))];
+fs.innerHTML+=SEV.map(s=>`<option>${s}</option>`).join("");ft.innerHTML+=types.map(s=>`<option>${s}</option>`).join("");
+function draw(){const q=document.getElementById("q").value.toLowerCase();
+rows.innerHTML=L.findings.filter(f=>(!fs.value||f.severity==fs.value)&&(!ft.value||f.type==ft.value)&&JSON.stringify(f).toLowerCase().includes(q)).map(f=>{
+const t=D.triage[f.id];return `<tr><td class="sv ${f.severity}">${f.severity}</td><td>${esc(f.type)}<br><small>${esc(f.tool)}</small></td>
+<td>${esc(f.title)}<br><code>${esc(f.rule)}</code></td><td><code>${esc(f.location)}${f.line?":"+f.line:""}</code></td>
+<td>${esc(f.fix)}${t?`<div class="ai">AI: ${esc(t.verdict)} — ${esc(t.note)}</div>`:""}</td></tr>`}).join("")}
+q.oninput=fs.onchange=ft.onchange=draw;draw();}
+</script></main></body></html>

@@ -1,0 +1,102 @@
+{
+  "17fa2f307c9f": {
+    "verdict": "true-positive",
+    "note": "PyYAML 5.3 has known RCE via FullLoader. Upgrade to PyYAML >= 5.4."
+  },
+  "4851790503db": {
+    "verdict": "true-positive",
+    "note": "PyYAML 5.3 has known RCE via FullLoader. Upgrade to PyYAML >= 5.4."
+  },
+  "9adbc0801cdc": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "63457b0016f0": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "7f2df4139e96": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "5cf1af82bde5": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "03c08413243e": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "cbe37295f7eb": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "ef5170bac855": {
+    "verdict": "true-positive",
+    "note": "Hardcoded token. Move to CI/CD variable / secret manager. Rotate immediately."
+  },
+  "53c26e1fb2aa": {
+    "verdict": "needs-review",
+    "note": "Review context. Upgrade to 2.3.2, 2.2.5"
+  },
+  "dbe7a225d3a0": {
+    "verdict": "needs-review",
+    "note": "Review context. Upgrade to 2.20.0"
+  },
+  "5148c0d766af": {
+    "verdict": "true-positive",
+    "note": "Run container as non-root user. Add USER nobody or USER app-user."
+  },
+  "154415fe31a8": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "f17b095a489b": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "405d5a426418": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "91113c1ab7cd": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "bc51d913d7eb": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "c1ee55ec6ada": {
+    "verdict": "true-positive",
+    "note": "User input concatenated into SQL string. Use parameterized queries with cursor.execute(\"... WHERE name=?\", (name,))."
+  },
+  "afb93ee43435": {
+    "verdict": "needs-review",
+    "note": "Review context. Upgrade to 2.31.0"
+  },
+  "7e66d31cd949": {
+    "verdict": "needs-review",
+    "note": "Review context. Upgrade to 2.32.0"
+  },
+  "e180720f0e0e": {
+    "verdict": "needs-review",
+    "note": "Review context. Upgrade to 2.32.4"
+  },
+  "40f61fb5185e": {
+    "verdict": "needs-review",
+    "note": "Review context. Upgrade to 2.33.0"
+  },
+  "6e2d4755b073": {
+    "verdict": "likely-false-positive",
+    "note": "Add security headers via flask-talisman or middleware: CSP, X-Frame-Options, etc."
+  },
+  "0730aeb5f853": {
+    "verdict": "likely-false-positive",
+    "note": "Add security headers via flask-talisman or middleware: CSP, X-Frame-Options, etc."
+  },
+  "d6207cb54067": {
+    "verdict": "likely-false-positive",
+    "note": "Add security headers via flask-talisman or middleware: CSP, X-Frame-Options, etc."
+  }
+}
