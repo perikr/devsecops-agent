@@ -156,7 +156,7 @@ def main():
     sh("python3", os.path.join(HERE, "make_music.py"), wav)
     out = os.path.join(HERE, "demo.mp4")
     sh("ffmpeg", "-y", "-i", silent, "-stream_loop", "-1", "-i", wav, "-t", f"{total:.2f}", "-map", "0:v", "-map", "1:a", "-c:v", "copy",
-       "-af", f"aecho=0.8:0.6:140|280:0.22|0.12,loudnorm=I=-20:TP=-2:LRA=7,afade=t=in:d=1.5,afade=t=out:st={total - 3:.2f}:d=3", "-c:a", "aac", "-ar", "44100", "-ac", "2", out)
+       "-af", f"aecho=0.8:0.6:140|280:0.22|0.12,loudnorm=I=-20:TP=-2:LRA=7,afade=t=in:d=1.5,afade=t=out:st={total - 3:.2f}:d=3", "-c:a", "aac", "-ar", "44100", "-ac", "2", "-movflags", "+faststart", out)
     print("built", out)
 
 if __name__ == "__main__":
